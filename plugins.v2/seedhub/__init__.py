@@ -25,7 +25,7 @@ class SeedHub(_PluginBase):
     # 插件图标
     plugin_icon = "search.png"
     # 插件版本
-    plugin_version = "1.2.5"
+    plugin_version = "1.2.6"
     # 插件作者
     plugin_author = "Claude"
     # 作者主页
@@ -349,8 +349,8 @@ class SeedHub(_PluginBase):
                                         "api": f"plugin/SeedHub/search?apikey={settings.API_TOKEN}",
                                         "method": "post",
                                         "params": {
-                                            "keyword": "{{searchKeyword}}",
-                                            "limit": "{{searchLimit}}"
+                                            "keyword": "$searchKeyword",
+                                            "limit": "$searchLimit"
                                         },
                                         "success": {
                                             "message": "搜索成功，找到 {{result.data.length}} 个结果，已复制到剪贴板",
@@ -425,8 +425,8 @@ class SeedHub(_PluginBase):
                                         "api": f"plugin/SeedHub/links?apikey={settings.API_TOKEN}",
                                         "method": "post",
                                         "params": {
-                                            "movie_id": "{{linkMovieId}}",
-                                            "quark_limit": "{{linkQuarkLimit}}"
+                                            "movie_id": "$linkMovieId",
+                                            "quark_limit": "$linkQuarkLimit"
                                         },
                                         "success": {
                                             "message": "链接解析成功，已复制到剪贴板",
