@@ -25,7 +25,7 @@ class SeedHub(_PluginBase):
     # 插件图标
     plugin_icon = "search.png"
     # 插件版本
-    plugin_version = "1.0"
+    plugin_version = "1.1"
     # 插件作者
     plugin_author = "Claude"
     # 作者主页
@@ -317,7 +317,7 @@ class SeedHub(_PluginBase):
                                         "component": "VTextField",
                                         "props": {
                                             "name": "keyword",
-                                            "label": "搜索关键词",
+                                            "label": "🔍 搜索关键词",
                                             "placeholder": "请输入要搜索的影视名称",
                                             "variant": "outlined",
                                             "density": "comfortable"
@@ -362,6 +362,75 @@ class SeedHub(_PluginBase):
             ]
         })
 
+        # 取链表单区域
+        page_content.append({
+            "component": "VCard",
+            "props": {"class": "mb-4 pa-4"},
+            "content": [
+                {
+                    "component": "VForm",
+                    "props": {
+                        "action": "/api/v1/plugin/SeedHub/links",
+                        "method": "post",
+                        "target": "_blank"
+                    },
+                    "content": [
+                        {
+                            "component": "VRow",
+                            "props": {"align": "center"},
+                            "content": [
+                                {
+                                    "component": "VCol",
+                                    "props": {"cols": 12, "md": 8},
+                                    "content": [{
+                                        "component": "VTextField",
+                                        "props": {
+                                            "name": "movie_id",
+                                            "label": "🔗 资源条目ID",
+                                            "placeholder": "请粘贴从搜索结果中复制的条目ID",
+                                            "variant": "outlined",
+                                            "density": "comfortable"
+                                        }
+                                    }],
+                                },
+                                {
+                                    "component": "VCol",
+                                    "props": {"cols": 12, "md": 2},
+                                    "content": [{
+                                        "component": "VTextField",
+                                        "props": {
+                                            "name": "quark_limit",
+                                            "label": "解析数量",
+                                            "type": "number",
+                                            "min": 1,
+                                            "max": 20,
+                                            "value": self._config.quark_limit,
+                                            "variant": "outlined",
+                                            "density": "comfortable"
+                                        }
+                                    }],
+                                },
+                                {
+                                    "component": "VCol",
+                                    "props": {"cols": 12, "md": 2},
+                                    "content": [{
+                                        "component": "VBtn",
+                                        "props": {
+                                            "type": "submit",
+                                            "color": "success",
+                                            "size": "large",
+                                            "block": True
+                                        },
+                                        "text": "获取链接"
+                                    }],
+                                },
+                            ],
+                        }
+                    ]
+                }
+            ]
+        })
+
         # 帮助提示
         page_content.append({
             "component": "VAlert",
@@ -371,7 +440,7 @@ class SeedHub(_PluginBase):
                 "border": "start",
                 "class": "mb-4"
             },
-            "text": "💡 搜索后会在新窗口展示结果，复制需要的条目ID后，可以通过命令 /seedhub_links [ID] 获取下载链接。后续版本将支持直接在页面内展示结果和一键取链。"
+            "text": "💡 操作流程：1. 在上方输入关键词点击搜索 → 2. 从新窗口的搜索结果中复制需要的条目ID → 3. 将ID粘贴到上方输入框点击获取链接 → 4. 新窗口会展示解析后的夸克直链和磁力链接。所有操作都会自动记录到下方历史列表。"
         })
 
         # 历史记录区域
