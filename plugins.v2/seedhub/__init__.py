@@ -25,7 +25,7 @@ class SeedHub(_PluginBase):
     # 插件图标
     plugin_icon = "search.png"
     # 插件版本
-    plugin_version = "1.2.3"
+    plugin_version = "1.2.4"
     # 插件作者
     plugin_author = "Claude"
     # 作者主页
@@ -339,36 +339,34 @@ class SeedHub(_PluginBase):
                             "content": [{
                                 "component": "VBtn",
                                 "props": {
-                                    "@click": "handleSearch",
                                     "color": "primary",
                                     "size": "large",
                                     "block": True
                                 },
-                                "text": "立即搜索"
+                                "text": "立即搜索",
+                                "events": {
+                                    "click": {
+                                        "api": "plugin/SeedHub/search",
+                                        "method": "post",
+                                        "params": {
+                                            "keyword": "{{searchKeyword}}",
+                                            "limit": "{{searchLimit}}"
+                                        },
+                                        "success": {
+                                            "message": "搜索成功，找到 {{result.data.length}} 个结果，已复制到剪贴板",
+                                            "action": "copy",
+                                            "data": "{{JSON.stringify(result.data, null, 2)}}"
+                                        },
+                                        "error": {
+                                            "message": "搜索失败：{{result.message}}"
+                                        }
+                                    }
+                                }
                             }],
                         },
                     ],
                 }
             ],
-            # 定义事件和API调用
-            "events": {
-                "handleSearch": {
-                    "url": "/api/v1/plugin/SeedHub/search",
-                    "method": "post",
-                    "params": {
-                        "keyword": "{{searchKeyword}}",
-                        "limit": "{{searchLimit}}"
-                    },
-                    "success": {
-                        "message": "搜索成功，找到 {{result.data.length}} 个结果",
-                        "action": "copy",
-                        "data": "{{JSON.stringify(result.data, null, 2)}}"
-                    },
-                    "error": {
-                        "message": "搜索失败：{{result.message}}"
-                    }
-                }
-            }
         })
 
         # 取链表单区域
@@ -417,36 +415,34 @@ class SeedHub(_PluginBase):
                             "content": [{
                                 "component": "VBtn",
                                 "props": {
-                                    "@click": "handleGetLinks",
                                     "color": "success",
                                     "size": "large",
                                     "block": True
                                 },
-                                "text": "获取链接"
+                                "text": "获取链接",
+                                "events": {
+                                    "click": {
+                                        "api": "plugin/SeedHub/links",
+                                        "method": "post",
+                                        "params": {
+                                            "movie_id": "{{linkMovieId}}",
+                                            "quark_limit": "{{linkQuarkLimit}}"
+                                        },
+                                        "success": {
+                                            "message": "链接解析成功，已复制到剪贴板",
+                                            "action": "copy",
+                                            "data": "{{JSON.stringify(result.data, null, 2)}}"
+                                        },
+                                        "error": {
+                                            "message": "获取链接失败：{{result.message}}"
+                                        }
+                                    }
+                                }
                             }],
                         },
                     ],
                 }
             ],
-            # 定义事件和API调用
-            "events": {
-                "handleGetLinks": {
-                    "url": "/api/v1/plugin/SeedHub/links",
-                    "method": "post",
-                    "params": {
-                        "movie_id": "{{linkMovieId}}",
-                        "quark_limit": "{{linkQuarkLimit}}"
-                    },
-                    "success": {
-                        "message": "链接解析成功",
-                        "action": "copy",
-                        "data": "{{JSON.stringify(result.data, null, 2)}}"
-                    },
-                    "error": {
-                        "message": "获取链接失败：{{result.message}}"
-                    }
-                }
-            }
         })
 
         # 帮助提示
