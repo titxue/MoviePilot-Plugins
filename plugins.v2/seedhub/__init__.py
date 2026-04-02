@@ -25,7 +25,7 @@ class SeedHub(_PluginBase):
     # 插件图标
     plugin_icon = "search.png"
     # 插件版本
-    plugin_version = "1.1"
+    plugin_version = "1.2"
     # 插件作者
     plugin_author = "Claude"
     # 作者主页
@@ -299,65 +299,56 @@ class SeedHub(_PluginBase):
             "props": {"class": "mb-4 pa-4"},
             "content": [
                 {
-                    "component": "VForm",
-                    "props": {
-                        "action": "/api/v1/plugin/SeedHub/search",
-                        "method": "post",
-                        "target": "_blank"
-                    },
+                    "component": "VRow",
+                    "props": {"align": "center"},
                     "content": [
                         {
-                            "component": "VRow",
-                            "props": {"align": "center"},
-                            "content": [
-                                {
-                                    "component": "VCol",
-                                    "props": {"cols": 12, "md": 8},
-                                    "content": [{
-                                        "component": "VTextField",
-                                        "props": {
-                                            "name": "keyword",
-                                            "label": "🔍 搜索关键词",
-                                            "placeholder": "请输入要搜索的影视名称",
-                                            "variant": "outlined",
-                                            "density": "comfortable"
-                                        }
-                                    }],
+                            "component": "VCol",
+                            "props": {"cols": 12, "md": 8},
+                            "content": [{
+                                "component": "VTextField",
+                                "props": {
+                                    "v-model": "searchKeyword",
+                                    "label": "🔍 搜索关键词",
+                                    "placeholder": "请输入要搜索的影视名称",
+                                    "variant": "outlined",
+                                    "density": "comfortable"
+                                }
+                            }],
+                        },
+                        {
+                            "component": "VCol",
+                            "props": {"cols": 12, "md": 2},
+                            "content": [{
+                                "component": "VTextField",
+                                "props": {
+                                    "v-model": "searchLimit",
+                                    "label": "结果数量",
+                                    "type": "number",
+                                    "min": 1,
+                                    "max": 50,
+                                    "value": self._config.search_limit,
+                                    "variant": "outlined",
+                                    "density": "comfortable"
+                                }
+                            }],
+                        },
+                        {
+                            "component": "VCol",
+                            "props": {"cols": 12, "md": 2},
+                            "content": [{
+                                "component": "VBtn",
+                                "props": {
+                                    "@click": "handleSearch",
+                                    "color": "primary",
+                                    "size": "large",
+                                    "block": True,
+                                    "loading": "searchLoading"
                                 },
-                                {
-                                    "component": "VCol",
-                                    "props": {"cols": 12, "md": 2},
-                                    "content": [{
-                                        "component": "VTextField",
-                                        "props": {
-                                            "name": "limit",
-                                            "label": "结果数量",
-                                            "type": "number",
-                                            "min": 1,
-                                            "max": 50,
-                                            "value": self._config.search_limit,
-                                            "variant": "outlined",
-                                            "density": "comfortable"
-                                        }
-                                    }],
-                                },
-                                {
-                                    "component": "VCol",
-                                    "props": {"cols": 12, "md": 2},
-                                    "content": [{
-                                        "component": "VBtn",
-                                        "props": {
-                                            "type": "submit",
-                                            "color": "primary",
-                                            "size": "large",
-                                            "block": True
-                                        },
-                                        "text": "立即搜索"
-                                    }],
-                                },
-                            ],
-                        }
-                    ]
+                                "text": "立即搜索"
+                            }],
+                        },
+                    ],
                 }
             ]
         })
@@ -368,63 +359,190 @@ class SeedHub(_PluginBase):
             "props": {"class": "mb-4 pa-4"},
             "content": [
                 {
-                    "component": "VForm",
-                    "props": {
-                        "action": "/api/v1/plugin/SeedHub/links",
-                        "method": "post",
-                        "target": "_blank"
-                    },
+                    "component": "VRow",
+                    "props": {"align": "center"},
                     "content": [
                         {
-                            "component": "VRow",
-                            "props": {"align": "center"},
-                            "content": [
-                                {
-                                    "component": "VCol",
-                                    "props": {"cols": 12, "md": 8},
-                                    "content": [{
-                                        "component": "VTextField",
-                                        "props": {
-                                            "name": "movie_id",
-                                            "label": "🔗 资源条目ID",
-                                            "placeholder": "请粘贴从搜索结果中复制的条目ID",
-                                            "variant": "outlined",
-                                            "density": "comfortable"
-                                        }
-                                    }],
+                            "component": "VCol",
+                            "props": {"cols": 12, "md": 8},
+                            "content": [{
+                                "component": "VTextField",
+                                "props": {
+                                    "v-model": "linkMovieId",
+                                    "label": "🔗 资源条目ID",
+                                    "placeholder": "请输入或粘贴资源条目ID",
+                                    "variant": "outlined",
+                                    "density": "comfortable"
+                                }
+                            }],
+                        },
+                        {
+                            "component": "VCol",
+                            "props": {"cols": 12, "md": 2},
+                            "content": [{
+                                "component": "VTextField",
+                                "props": {
+                                    "v-model": "linkQuarkLimit",
+                                    "label": "解析数量",
+                                    "type": "number",
+                                    "min": 1,
+                                    "max": 20,
+                                    "value": self._config.quark_limit,
+                                    "variant": "outlined",
+                                    "density": "comfortable"
+                                }
+                            }],
+                        },
+                        {
+                            "component": "VCol",
+                            "props": {"cols": 12, "md": 2},
+                            "content": [{
+                                "component": "VBtn",
+                                "props": {
+                                    "@click": "handleGetLinks",
+                                    "color": "success",
+                                    "size": "large",
+                                    "block": True,
+                                    "loading": "linkLoading"
                                 },
-                                {
-                                    "component": "VCol",
-                                    "props": {"cols": 12, "md": 2},
-                                    "content": [{
-                                        "component": "VTextField",
-                                        "props": {
-                                            "name": "quark_limit",
-                                            "label": "解析数量",
-                                            "type": "number",
-                                            "min": 1,
-                                            "max": 20,
-                                            "value": self._config.quark_limit,
-                                            "variant": "outlined",
-                                            "density": "comfortable"
-                                        }
-                                    }],
+                                "text": "获取链接"
+                            }],
+                        },
+                    ],
+                }
+            ]
+        })
+
+        # 搜索结果展示区域
+        page_content.append({
+            "component": "VCard",
+            "props": {"class": "mb-4 pa-4", "v-show": "searchResults.length > 0"},
+            "content": [
+                {
+                    "component": "h3",
+                    "text": "🔍 搜索结果",
+                    "props": {"class": "mb-3"}
+                },
+                {
+                    "component": "VDataTable",
+                    "props": {
+                        "headers": [
+                            {"title": "标题", "key": "title", "sortable": False},
+                            {"title": "评分", "key": "rating", "sortable": True, "width": "100px"},
+                            {"title": "年份", "key": "year", "sortable": True, "width": "100px"},
+                            {"title": "ID", "key": "id", "sortable": False, "width": "150px"},
+                            {"title": "操作", "key": "action", "sortable": False, "width": "150px"},
+                        ],
+                        "items": "searchResults",
+                        "density": "compact",
+                        "hide-no-data": True,
+                        "hover": True,
+                    },
+                    "content": [{
+                        "component": "template",
+                        "props": {"v-slot:item.action": "{ item }"},
+                        "content": [
+                            {
+                                "component": "VBtn",
+                                "props": {
+                                    "size": "small",
+                                    "variant": "outlined",
+                                    "color": "primary",
+                                    "@click": "copyId(item.id)"
                                 },
-                                {
-                                    "component": "VCol",
-                                    "props": {"cols": 12, "md": 2},
-                                    "content": [{
-                                        "component": "VBtn",
-                                        "props": {
-                                            "type": "submit",
-                                            "color": "success",
-                                            "size": "large",
-                                            "block": True
-                                        },
-                                        "text": "获取链接"
-                                    }],
+                                "text": "复制ID"
+                            },
+                            {
+                                "component": "VBtn",
+                                "props": {
+                                    "size": "small",
+                                    "variant": "outlined",
+                                    "color": "success",
+                                    "class": "ml-2",
+                                    "@click": "quickGetLinks(item.id)"
                                 },
-                            ],
+                                "text": "取链"
+                            }
+                        ]
+                    }]
+                }
+            ]
+        })
+
+        # 链接结果展示区域
+        page_content.append({
+            "component": "VCard",
+            "props": {"class": "mb-4 pa-4", "v-show": "linkResults.title"},
+            "content": [
+                {
+                    "component": "h3",
+                    "text": "🔗 下载链接",
+                    "props": {"class": "mb-3"}
+                },
+                {
+                    "component": "h4",
+                    "text": "{{ linkResults.title }}",
+                    "props": {"class": "mb-3 text-primary"}
+                },
+                {
+                    "component": "div",
+                    "v-show": "linkResults.quark_resolved.length > 0",
+                    "content": [
+                        {
+                            "component": "h5",
+                            "text": "✅ 夸克网盘直链",
+                            "props": {"class": "mb-2"}
+                        },
+                        {
+                            "component": "VList",
+                            "props": {"lines": "two"},
+                            "content": [{
+                                "component": "VListItem",
+                                "props": {"v-for": "(link, index) in linkResults.quark_resolved", ":key": "index"},
+                                "content": [
+                                    {
+                                        "component": "VListItemTitle",
+                                        "text": "{{ link.title || '夸克链接 ' + (index + 1) }}"
+                                    },
+                                    {
+                                        "component": "VListItemSubtitle",
+                                        "content": [{
+                                            "component": "a",
+                                            "props": {
+                                                "href": link.url,
+                                                "target": "_blank",
+                                                "class": "text-decoration-none"
+                                            },
+                                            "text": "{{ link.url }}"
+                                        }]
+                                    }
+                                ]
+                            }]
+                        }
+                    ]
+                },
+                {
+                    "component": "div",
+                    "v-show": "linkResults.magnet.length > 0",
+                    "content": [
+                        {
+                            "component": "h5",
+                            "text": "🧲 磁力链接",
+                            "props": {"class": "mb-2 mt-4"}
+                        },
+                        {
+                            "component": "VList",
+                            "props": {"lines": "one"},
+                            "content": [{
+                                "component": "VListItem",
+                                "props": {"v-for": "(link, index) in linkResults.magnet", ":key": "index"},
+                                "content": [
+                                    {
+                                        "component": "VListItemTitle",
+                                        "text": "{{ link }}"
+                                    }
+                                ]
+                            }]
                         }
                     ]
                 }
@@ -440,7 +558,88 @@ class SeedHub(_PluginBase):
                 "border": "start",
                 "class": "mb-4"
             },
-            "text": "💡 操作流程：1. 在上方输入关键词点击搜索 → 2. 从新窗口的搜索结果中复制需要的条目ID → 3. 将ID粘贴到上方输入框点击获取链接 → 4. 新窗口会展示解析后的夸克直链和磁力链接。所有操作都会自动记录到下方历史列表。"
+            "text": "💡 操作说明：输入关键词点击搜索，结果会直接展示在下方；点击「复制ID」可以复制资源ID，点击「取链」可以直接获取该资源的下载链接；所有操作自动记录到历史列表。"
+        })
+
+        # 前端交互脚本
+        page_content.append({
+            "component": "script",
+            "text": """
+export default {
+  data() {
+    return {
+      searchKeyword: '',
+      searchLimit: %d,
+      searchLoading: false,
+      searchResults: [],
+
+      linkMovieId: '',
+      linkQuarkLimit: %d,
+      linkLoading: false,
+      linkResults: {},
+    }
+  },
+  methods: {
+    async handleSearch() {
+      if (!this.searchKeyword.trim()) {
+        this.$message.warning('请输入搜索关键词')
+        return
+      }
+      this.searchLoading = true
+      try {
+        const res = await this.$api.post('/plugin/SeedHub/search', {
+          keyword: this.searchKeyword,
+          limit: this.searchLimit
+        })
+        if (res.success) {
+          this.searchResults = res.data
+          this.$message.success(`找到 ${res.data.length} 个结果`)
+        } else {
+          this.$message.error(res.message || '搜索失败')
+        }
+      } catch (err) {
+        this.$message.error('搜索请求失败：' + err.message)
+      } finally {
+        this.searchLoading = false
+      }
+    },
+
+    async handleGetLinks() {
+      if (!this.linkMovieId.trim()) {
+        this.$message.warning('请输入资源条目ID')
+        return
+      }
+      this.linkLoading = true
+      try {
+        const res = await this.$api.post('/plugin/SeedHub/links', {
+          movie_id: this.linkMovieId,
+          quark_limit: this.linkQuarkLimit
+        })
+        if (res.success) {
+          this.linkResults = res.data
+          this.$message.success('链接解析成功')
+        } else {
+          this.$message.error(res.message || '获取链接失败')
+        }
+      } catch (err) {
+        this.$message.error('获取链接请求失败：' + err.message)
+      } finally {
+        this.linkLoading = false
+      }
+    },
+
+    quickGetLinks(movieId) {
+      this.linkMovieId = movieId
+      this.handleGetLinks()
+    },
+
+    copyId(id) {
+      navigator.clipboard.writeText(id)
+      this.$message.success('ID 已复制到剪贴板')
+    }
+  }
+}
+            """ % (self._config.search_limit, self._config.quark_limit)
         })
 
         # 历史记录区域

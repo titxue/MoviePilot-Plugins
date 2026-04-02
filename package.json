@@ -1,9 +1,9 @@
 {
   "SeedHub": {
     "name": "SeedHub 搜索",
-    "description": "搜索 SeedHub 影视资源并提取夸克等下载链接。支持页面可视化搜索与取链全流程操作。",
+    "description": "搜索 SeedHub 影视资源并提取夸克等下载链接。支持全页面内无跳转搜索与取链，自动处理API认证，无需手动输入密钥。",
     "labels": "工具,网盘,资源搜索",
-    "version": "1.1",
+    "version": "1.2",
     "icon": "search.png",
     "author": "Claude",
     "level": 1,
