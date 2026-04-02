@@ -25,7 +25,7 @@ class SeedHub(_PluginBase):
     # 插件图标
     plugin_icon = "search.png"
     # 插件版本
-    plugin_version = "1.2.4"
+    plugin_version = "1.2.5"
     # 插件作者
     plugin_author = "Claude"
     # 作者主页
@@ -346,7 +346,7 @@ class SeedHub(_PluginBase):
                                 "text": "立即搜索",
                                 "events": {
                                     "click": {
-                                        "api": "plugin/SeedHub/search",
+                                        "api": f"plugin/SeedHub/search?apikey={settings.API_TOKEN}",
                                         "method": "post",
                                         "params": {
                                             "keyword": "{{searchKeyword}}",
@@ -422,7 +422,7 @@ class SeedHub(_PluginBase):
                                 "text": "获取链接",
                                 "events": {
                                     "click": {
-                                        "api": "plugin/SeedHub/links",
+                                        "api": f"plugin/SeedHub/links?apikey={settings.API_TOKEN}",
                                         "method": "post",
                                         "params": {
                                             "movie_id": "{{linkMovieId}}",
