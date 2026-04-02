@@ -3,7 +3,7 @@
     "name": "SeedHub 搜索",
     "description": "搜索 SeedHub 影视资源并提取夸克等下载链接。支持页面内搜索和取链，符合官方交互规范，自动处理API认证。",
     "labels": "工具,网盘,资源搜索",
-    "version": "1.2.8",
+    "version": "1.3.0",
     "icon": "search.png",
     "author": "Claude",
     "level": 1,
