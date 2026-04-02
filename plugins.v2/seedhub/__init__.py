@@ -25,7 +25,7 @@ class SeedHub(_PluginBase):
     # 插件图标
     plugin_icon = "https://raw.githubusercontent.com/Hqyel/MoviePilot-Plugins/main/icons/nullbr.png"
     # 插件版本
-    plugin_version = "1.3.0"
+    plugin_version = "1.3.1"
     # 插件作者
     plugin_author = "Claude"
     # 作者主页
@@ -229,35 +229,299 @@ class SeedHub(_PluginBase):
         ], self._config.model_dump()
 
     def get_page(self) -> List[dict]:
-        history = self.get_data("history") or []
-        page_content = [
-            {
-                "component": "VCard",
-                "props": {"class": "pa-4 mb-4"},
-                "content": [
-                    {
-                        "component": "div",
-                        "text": "SeedHub 资源搜索",
-                        "props": {"class": "text-h5 text-primary mb-2"}
-                    },
-                    {
-                        "component": "div",
-                        "text": "请使用插件命令或 API 完成搜索与取链，详情页仅展示基础说明与最近历史。",
-                        "props": {"class": "text-body-2 text-medium-emphasis"}
-                    }
-                ]
-            },
-            {
-                "component": "VAlert",
-                "props": {
-                    "type": "info",
-                    "variant": "tonal",
-                    "class": "mb-4"
-                },
-                "text": "命令：/seedhub_search 关键词；/seedhub_links 条目 ID。也可通过插件 API 调用 /search、/links、/status。"
-            }
-        ]
+        page_content = []
 
+        page_content.append({
+            "component": "VCard",
+            "props": {"class": "pa-4 mb-4"},
+            "content": [
+                {
+                    "component": "div",
+                    "text": "SeedHub 资源搜索",
+                    "props": {"class": "text-h5 text-primary mb-2"}
+                },
+                {
+                    "component": "div",
+                    "text": "页面内可直接完成搜索与取链，结果会展示在当前详情页，并写入最近历史。",
+                    "props": {"class": "text-body-2 text-medium-emphasis"}
+                }
+            ]
+        })
+
+        page_content.append({
+            "component": "VCard",
+            "props": {"class": "mb-4 pa-4"},
+            "content": [
+                {
+                    "component": "VForm",
+                    "content": [
+                        {
+                            "component": "VRow",
+                            "props": {"align": "center"},
+                            "content": [
+                                {
+                                    "component": "VCol",
+                                    "props": {"cols": 12, "md": 8},
+                                    "content": [{
+                                        "component": "VTextField",
+                                        "props": {
+                                            "model": "keyword",
+                                            "label": "搜索关键词",
+                                            "placeholder": "请输入要搜索的影视名称",
+                                            "variant": "outlined",
+                                            "density": "comfortable"
+                                        }
+                                    }],
+                                },
+                                {
+                                    "component": "VCol",
+                                    "props": {"cols": 12, "md": 2},
+                                    "content": [{
+                                        "component": "VTextField",
+                                        "props": {
+                                            "model": "limit",
+                                            "label": "结果数量",
+                                            "type": "number",
+                                            "min": 1,
+                                            "max": 50,
+                                            "value": self._config.search_limit,
+                                            "variant": "outlined",
+                                            "density": "comfortable"
+                                        }
+                                    }],
+                                },
+                                {
+                                    "component": "VCol",
+                                    "props": {"cols": 12, "md": 2},
+                                    "content": [{
+                                        "component": "VBtn",
+                                        "props": {
+                                            "color": "primary",
+                                            "size": "large",
+                                            "block": True
+                                        },
+                                        "text": "立即搜索",
+                                        "events": {
+                                            "click": {
+                                                "api": f"plugin/SeedHub/search?apikey={settings.API_TOKEN}",
+                                                "method": "post",
+                                                "form": True,
+                                                "success": {
+                                                    "message": "搜索成功，找到 {{result.data.length}} 个结果",
+                                                    "set": {
+                                                        "searchResults": "{{result.data}}",
+                                                        "searchError": "",
+                                                        "linksResult": null,
+                                                        "linksError": "",
+                                                        "linkMovieId": ""
+                                                    }
+                                                },
+                                                "error": {
+                                                    "message": "搜索失败：{{result.message}}",
+                                                    "set": {
+                                                        "searchResults": [],
+                                                        "searchError": "{{result.message}}"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }],
+                                },
+                            ],
+                        }
+                    ]
+                }
+            ],
+        })
+
+        page_content.append({
+            "component": "VCard",
+            "props": {"class": "mb-4 pa-4"},
+            "content": [
+                {
+                    "component": "VForm",
+                    "content": [
+                        {
+                            "component": "VRow",
+                            "props": {"align": "center"},
+                            "content": [
+                                {
+                                    "component": "VCol",
+                                    "props": {"cols": 12, "md": 8},
+                                    "content": [{
+                                        "component": "VTextField",
+                                        "props": {
+                                            "model": "movie_id",
+                                            "label": "资源条目 ID",
+                                            "placeholder": "请输入搜索结果中的条目 ID",
+                                            "variant": "outlined",
+                                            "density": "comfortable"
+                                        }
+                                    }],
+                                },
+                                {
+                                    "component": "VCol",
+                                    "props": {"cols": 12, "md": 2},
+                                    "content": [{
+                                        "component": "VTextField",
+                                        "props": {
+                                            "model": "quark_limit",
+                                            "label": "解析数量",
+                                            "type": "number",
+                                            "min": 1,
+                                            "max": 20,
+                                            "value": self._config.quark_limit,
+                                            "variant": "outlined",
+                                            "density": "comfortable"
+                                        }
+                                    }],
+                                },
+                                {
+                                    "component": "VCol",
+                                    "props": {"cols": 12, "md": 2},
+                                    "content": [{
+                                        "component": "VBtn",
+                                        "props": {
+                                            "color": "success",
+                                            "size": "large",
+                                            "block": True
+                                        },
+                                        "text": "获取链接",
+                                        "events": {
+                                            "click": {
+                                                "api": f"plugin/SeedHub/links?apikey={settings.API_TOKEN}",
+                                                "method": "post",
+                                                "form": True,
+                                                "success": {
+                                                    "message": "链接解析成功",
+                                                    "set": {
+                                                        "linksResult": "{{result.data}}",
+                                                        "linkMovieId": "{{form.movie_id || ''}}",
+                                                        "linksError": ""
+                                                    }
+                                                },
+                                                "error": {
+                                                    "message": "获取链接失败：{{result.message}}",
+                                                    "set": {
+                                                        "linksResult": null,
+                                                        "linksError": "{{result.message}}"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }],
+                                },
+                            ],
+                        }
+                    ]
+                }
+            ],
+        })
+
+        page_content.append({
+            "component": "VAlert",
+            "props": {
+                "type": "info",
+                "variant": "tonal",
+                "class": "mb-4"
+            },
+            "text": "使用说明：先搜索，再将结果中的条目 ID 填入取链区域。提交后详情页会自动刷新，最近历史会保留本次操作记录。"
+        })
+
+        page_content.append({
+            "component": "VAlert",
+            "props": {
+                "type": "error",
+                "variant": "tonal",
+                "class": "mb-4",
+                "show": "{{searchError}}"
+            },
+            "text": "{{searchError}}"
+        })
+
+        page_content.append({
+            "component": "VCard",
+            "props": {"class": "mb-4 pa-4", "show": "{{searchResults && searchResults.length}}"},
+            "content": [
+                {
+                    "component": "div",
+                    "text": "搜索结果",
+                    "props": {"class": "text-subtitle-1 mb-3"}
+                },
+                {
+                    "component": "VTextarea",
+                    "props": {
+                        "label": "结果列表",
+                        "rows": 12,
+                        "readonly": True,
+                        "auto-grow": True,
+                        "variant": "outlined",
+                        "model-value": "{{(searchResults || []).map(item => `ID: ${item.id} | ${item.title} | 评分: ${item.rating || '?'}`).join('\\n')}}"
+                    }
+                }
+            ]
+        })
+
+        page_content.append({
+            "component": "VAlert",
+            "props": {
+                "type": "error",
+                "variant": "tonal",
+                "class": "mb-4",
+                "show": "{{linksError}}"
+            },
+            "text": "{{linksError}}"
+        })
+
+        page_content.append({
+            "component": "VCard",
+            "props": {"class": "mb-4 pa-4", "show": "{{linksResult}}"},
+            "content": [
+                {
+                    "component": "div",
+                    "text": "取链结果",
+                    "props": {"class": "text-subtitle-1 mb-3"}
+                },
+                {
+                    "component": "VTextField",
+                    "props": {
+                        "model": "linkMovieId",
+                        "label": "当前条目 ID",
+                        "readonly": True,
+                        "variant": "outlined",
+                        "class": "mb-3",
+                        "show": "{{linkMovieId}}"
+                    }
+                },
+                {
+                    "component": "VTextarea",
+                    "props": {
+                        "label": "夸克直链",
+                        "rows": 6,
+                        "readonly": True,
+                        "auto-grow": True,
+                        "variant": "outlined",
+                        "model-value": "{{(linksResult.quark_resolved || []).map(item => item.url).filter(Boolean).join('\\n')}}",
+                        "show": "{{linksResult && linksResult.quark_resolved && linksResult.quark_resolved.length}}"
+                    }
+                },
+                {
+                    "component": "VTextarea",
+                    "props": {
+                        "label": "磁力链接",
+                        "rows": 6,
+                        "readonly": True,
+                        "auto-grow": True,
+                        "variant": "outlined",
+                        "class": "mt-3",
+                        "model-value": "{{(linksResult.magnet || []).join('\\n')}}",
+                        "show": "{{linksResult && linksResult.magnet && linksResult.magnet.length}}"
+                    }
+                }
+            ]
+        })
+
+        history = self.get_data("history") or []
         if history:
             page_content.append({
                 "component": "VCard",
