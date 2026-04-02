@@ -25,7 +25,7 @@ class SeedHub(_PluginBase):
     # 插件图标
     plugin_icon = "search.png"
     # 插件版本
-    plugin_version = "1.2.2"
+    plugin_version = "1.2.3"
     # 插件作者
     plugin_author = "Claude"
     # 作者主页
@@ -339,7 +339,7 @@ class SeedHub(_PluginBase):
                             "content": [{
                                 "component": "VBtn",
                                 "props": {
-                                    "onclick": "handleSearch",
+                                    "@click": "handleSearch",
                                     "color": "primary",
                                     "size": "large",
                                     "block": True
@@ -417,7 +417,7 @@ class SeedHub(_PluginBase):
                             "content": [{
                                 "component": "VBtn",
                                 "props": {
-                                    "onclick": "handleGetLinks",
+                                    "@click": "handleGetLinks",
                                     "color": "success",
                                     "size": "large",
                                     "block": True
