@@ -25,7 +25,7 @@ class SeedHub(_PluginBase):
     # 插件图标
     plugin_icon = "search.png"
     # 插件版本
-    plugin_version = "1.2.6"
+    plugin_version = "1.2.7"
     # 插件作者
     plugin_author = "Claude"
     # 作者主页
@@ -299,72 +299,75 @@ class SeedHub(_PluginBase):
             "props": {"class": "mb-4 pa-4"},
             "content": [
                 {
-                    "component": "VRow",
-                    "props": {"align": "center"},
+                    "component": "VForm",
                     "content": [
                         {
-                            "component": "VCol",
-                            "props": {"cols": 12, "md": 8},
-                            "content": [{
-                                "component": "VTextField",
-                                "props": {
-                                    "model": "searchKeyword",
-                                    "label": "🔍 搜索关键词",
-                                    "placeholder": "请输入要搜索的影视名称",
-                                    "variant": "outlined",
-                                    "density": "comfortable"
-                                }
-                            }],
-                        },
-                        {
-                            "component": "VCol",
-                            "props": {"cols": 12, "md": 2},
-                            "content": [{
-                                "component": "VTextField",
-                                "props": {
-                                    "model": "searchLimit",
-                                    "label": "结果数量",
-                                    "type": "number",
-                                    "min": 1,
-                                    "max": 50,
-                                    "value": self._config.search_limit,
-                                    "variant": "outlined",
-                                    "density": "comfortable"
-                                }
-                            }],
-                        },
-                        {
-                            "component": "VCol",
-                            "props": {"cols": 12, "md": 2},
-                            "content": [{
-                                "component": "VBtn",
-                                "props": {
-                                    "color": "primary",
-                                    "size": "large",
-                                    "block": True
-                                },
-                                "text": "立即搜索",
-                                "events": {
-                                    "click": {
-                                        "api": f"plugin/SeedHub/search?apikey={settings.API_TOKEN}",
-                                        "method": "post",
-                                        "params": {
-                                            "keyword": "$searchKeyword",
-                                            "limit": "$searchLimit"
-                                        },
-                                        "success": {
-                                            "message": "搜索成功，找到 {{result.data.length}} 个结果，已复制到剪贴板",
-                                            "action": "copy",
-                                            "data": "{{JSON.stringify(result.data, null, 2)}}"
-                                        },
-                                        "error": {
-                                            "message": "搜索失败：{{result.message}}"
+                            "component": "VRow",
+                            "props": {"align": "center"},
+                            "content": [
+                                {
+                                    "component": "VCol",
+                                    "props": {"cols": 12, "md": 8},
+                                    "content": [{
+                                        "component": "VTextField",
+                                        "props": {
+                                            "model": "searchKeyword",
+                                            "label": "🔍 搜索关键词",
+                                            "placeholder": "请输入要搜索的影视名称",
+                                            "variant": "outlined",
+                                            "density": "comfortable"
                                         }
-                                    }
-                                }
-                            }],
-                        },
-                    ],
+                                    }],
+                                },
+                                {
+                                    "component": "VCol",
+                                    "props": {"cols": 12, "md": 2},
+                                    "content": [{
+                                        "component": "VTextField",
+                                        "props": {
+                                            "model": "searchLimit",
+                                            "label": "结果数量",
+                                            "type": "number",
+                                            "min": 1,
+                                            "max": 50,
+                                            "value": self._config.search_limit,
+                                            "variant": "outlined",
+                                            "density": "comfortable"
+                                        }
+                                    }],
+                                },
+                                {
+                                    "component": "VCol",
+                                    "props": {"cols": 12, "md": 2},
+                                    "content": [{
+                                        "component": "VBtn",
+                                        "props": {
+                                            "type": "submit",
+                                            "color": "primary",
+                                            "size": "large",
+                                            "block": True
+                                        },
+                                        "text": "立即搜索",
+                                        "events": {
+                                            "click": {
+                                                "api": f"plugin/SeedHub/search?apikey={settings.API_TOKEN}",
+                                                "method": "post",
+                                                "form": true,
+                                                "success": {
+                                                    "message": "搜索成功，找到 {{result.data.length}} 个结果，已复制到剪贴板",
+                                                    "action": "copy",
+                                                    "data": "{{JSON.stringify(result.data, null, 2)}}"
+                                                },
+                                                "error": {
+                                                    "message": "搜索失败：{{result.message}}"
+                                                }
+                                            }
+                                        }
+                                    }],
+                                },
+                            ],
+                        }
+                    ]
                 }
             ],
         })
@@ -375,72 +378,75 @@ class SeedHub(_PluginBase):
             "props": {"class": "mb-4 pa-4"},
             "content": [
                 {
-                    "component": "VRow",
-                    "props": {"align": "center"},
+                    "component": "VForm",
                     "content": [
                         {
-                            "component": "VCol",
-                            "props": {"cols": 12, "md": 8},
-                            "content": [{
-                                "component": "VTextField",
-                                "props": {
-                                    "model": "linkMovieId",
-                                    "label": "🔗 资源条目ID",
-                                    "placeholder": "请输入资源条目ID",
-                                    "variant": "outlined",
-                                    "density": "comfortable"
-                                }
-                            }],
-                        },
-                        {
-                            "component": "VCol",
-                            "props": {"cols": 12, "md": 2},
-                            "content": [{
-                                "component": "VTextField",
-                                "props": {
-                                    "model": "linkQuarkLimit",
-                                    "label": "解析数量",
-                                    "type": "number",
-                                    "min": 1,
-                                    "max": 20,
-                                    "value": self._config.quark_limit,
-                                    "variant": "outlined",
-                                    "density": "comfortable"
-                                }
-                            }],
-                        },
-                        {
-                            "component": "VCol",
-                            "props": {"cols": 12, "md": 2},
-                            "content": [{
-                                "component": "VBtn",
-                                "props": {
-                                    "color": "success",
-                                    "size": "large",
-                                    "block": True
-                                },
-                                "text": "获取链接",
-                                "events": {
-                                    "click": {
-                                        "api": f"plugin/SeedHub/links?apikey={settings.API_TOKEN}",
-                                        "method": "post",
-                                        "params": {
-                                            "movie_id": "$linkMovieId",
-                                            "quark_limit": "$linkQuarkLimit"
-                                        },
-                                        "success": {
-                                            "message": "链接解析成功，已复制到剪贴板",
-                                            "action": "copy",
-                                            "data": "{{JSON.stringify(result.data, null, 2)}}"
-                                        },
-                                        "error": {
-                                            "message": "获取链接失败：{{result.message}}"
+                            "component": "VRow",
+                            "props": {"align": "center"},
+                            "content": [
+                                {
+                                    "component": "VCol",
+                                    "props": {"cols": 12, "md": 8},
+                                    "content": [{
+                                        "component": "VTextField",
+                                        "props": {
+                                            "model": "linkMovieId",
+                                            "label": "🔗 资源条目ID",
+                                            "placeholder": "请输入资源条目ID",
+                                            "variant": "outlined",
+                                            "density": "comfortable"
                                         }
-                                    }
-                                }
-                            }],
-                        },
-                    ],
+                                    }],
+                                },
+                                {
+                                    "component": "VCol",
+                                    "props": {"cols": 12, "md": 2},
+                                    "content": [{
+                                        "component": "VTextField",
+                                        "props": {
+                                            "model": "linkQuarkLimit",
+                                            "label": "解析数量",
+                                            "type": "number",
+                                            "min": 1,
+                                            "max": 20,
+                                            "value": self._config.quark_limit,
+                                            "variant": "outlined",
+                                            "density": "comfortable"
+                                        }
+                                    }],
+                                },
+                                {
+                                    "component": "VCol",
+                                    "props": {"cols": 12, "md": 2},
+                                    "content": [{
+                                        "component": "VBtn",
+                                        "props": {
+                                            "type": "submit",
+                                            "color": "success",
+                                            "size": "large",
+                                            "block": True
+                                        },
+                                        "text": "获取链接",
+                                        "events": {
+                                            "click": {
+                                                "api": f"plugin/SeedHub/links?apikey={settings.API_TOKEN}",
+                                                "method": "post",
+                                                "form": true,
+                                                "success": {
+                                                    "message": "链接解析成功，已复制到剪贴板",
+                                                    "action": "copy",
+                                                    "data": "{{JSON.stringify(result.data, null, 2)}}"
+                                                },
+                                                "error": {
+                                                    "message": "获取链接失败：{{result.message}}"
+                                                }
+                                            }
+                                        }
+                                    }],
+                                },
+                            ],
+                        }
+                    ]
                 }
             ],
         })
