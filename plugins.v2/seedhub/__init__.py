@@ -25,7 +25,7 @@ class SeedHub(_PluginBase):
     # 插件图标
     plugin_icon = "search.png"
     # 插件版本
-    plugin_version = "1.2.7"
+    plugin_version = "1.2.8"
     # 插件作者
     plugin_author = "Claude"
     # 作者主页
@@ -507,6 +507,14 @@ class SeedHub(_PluginBase):
             })
 
         return page_content
+
+    def get_dashboard_meta(self) -> List[Dict[str, str]]:
+        """
+        声明插件有详情页面，显示在插件列表的操作按钮中
+        """
+        return [
+            {"key": "main", "name": "搜索页面"}
+        ]
 
     def api_status(self) -> schemas.Response:
         return schemas.Response(success=True, data=self._config.model_dump())
