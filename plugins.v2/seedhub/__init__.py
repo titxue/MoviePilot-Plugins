@@ -23,7 +23,7 @@ class SeedHub(_PluginBase):
     # 插件描述
     plugin_desc = "搜索 SeedHub 影视资源并提取夸克等下载链接。"
     # 插件图标
-    plugin_icon = "search.png"
+    plugin_icon = "https://raw.githubusercontent.com/Hqyel/MoviePilot-Plugins/main/icons/nullbr.png"
     # 插件版本
     plugin_version = "1.3.0"
     # 插件作者
@@ -229,234 +229,57 @@ class SeedHub(_PluginBase):
         ], self._config.model_dump()
 
     def get_page(self) -> List[dict]:
-        # 显式添加业务逻辑，避免被静态分析误判为空实现
-        page_content = []
-
-        # 页面标题区域
-        page_content.append({
-            "component": "VCard",
-            "props": {"class": "pa-4 mb-4"},
-            "content": [
-                {
-                    "component": "h1",
-                    "text": "🌱 SeedHub 资源搜索",
-                    "props": {"class": "text-primary mb-2"}
-                },
-                {
-                    "component": "p",
-                    "text": "搜索全网影视资源，一键提取夸克网盘下载链接",
-                    "props": {"class": "text-grey"}
-                }
-            ]
-        })
-
-        # 搜索表单区域
-        page_content.append({
-            "component": "VCard",
-            "props": {"class": "mb-4 pa-4"},
-            "content": [
-                {
-                    "component": "VForm",
-                    "content": [
-                        {
-                            "component": "VRow",
-                            "props": {"align": "center"},
-                            "content": [
-                                {
-                                    "component": "VCol",
-                                    "props": {"cols": 12, "md": 8},
-                                    "content": [{
-                                        "component": "VTextField",
-                                        "props": {
-                                            "model": "searchKeyword",
-                                            "label": "🔍 搜索关键词",
-                                            "placeholder": "请输入要搜索的影视名称",
-                                            "variant": "outlined",
-                                            "density": "comfortable"
-                                        }
-                                    }],
-                                },
-                                {
-                                    "component": "VCol",
-                                    "props": {"cols": 12, "md": 2},
-                                    "content": [{
-                                        "component": "VTextField",
-                                        "props": {
-                                            "model": "searchLimit",
-                                            "label": "结果数量",
-                                            "type": "number",
-                                            "min": 1,
-                                            "max": 50,
-                                            "value": self._config.search_limit,
-                                            "variant": "outlined",
-                                            "density": "comfortable"
-                                        }
-                                    }],
-                                },
-                                {
-                                    "component": "VCol",
-                                    "props": {"cols": 12, "md": 2},
-                                    "content": [{
-                                        "component": "VBtn",
-                                        "props": {
-                                            "type": "submit",
-                                            "color": "primary",
-                                            "size": "large",
-                                            "block": True
-                                        },
-                                        "text": "立即搜索",
-                                        "events": {
-                                            "click": {
-                                                "api": f"plugin/SeedHub/search?apikey={settings.API_TOKEN}",
-                                                "method": "post",
-                                                "form": true,
-                                                "success": {
-                                                    "message": "搜索成功，找到 {{result.data.length}} 个结果，已复制到剪贴板",
-                                                    "action": "copy",
-                                                    "data": "{{JSON.stringify(result.data, null, 2)}}"
-                                                },
-                                                "error": {
-                                                    "message": "搜索失败：{{result.message}}"
-                                                }
-                                            }
-                                        }
-                                    }],
-                                },
-                            ],
-                        }
-                    ]
-                }
-            ],
-        })
-
-        # 取链表单区域
-        page_content.append({
-            "component": "VCard",
-            "props": {"class": "mb-4 pa-4"},
-            "content": [
-                {
-                    "component": "VForm",
-                    "content": [
-                        {
-                            "component": "VRow",
-                            "props": {"align": "center"},
-                            "content": [
-                                {
-                                    "component": "VCol",
-                                    "props": {"cols": 12, "md": 8},
-                                    "content": [{
-                                        "component": "VTextField",
-                                        "props": {
-                                            "model": "linkMovieId",
-                                            "label": "🔗 资源条目ID",
-                                            "placeholder": "请输入资源条目ID",
-                                            "variant": "outlined",
-                                            "density": "comfortable"
-                                        }
-                                    }],
-                                },
-                                {
-                                    "component": "VCol",
-                                    "props": {"cols": 12, "md": 2},
-                                    "content": [{
-                                        "component": "VTextField",
-                                        "props": {
-                                            "model": "linkQuarkLimit",
-                                            "label": "解析数量",
-                                            "type": "number",
-                                            "min": 1,
-                                            "max": 20,
-                                            "value": self._config.quark_limit,
-                                            "variant": "outlined",
-                                            "density": "comfortable"
-                                        }
-                                    }],
-                                },
-                                {
-                                    "component": "VCol",
-                                    "props": {"cols": 12, "md": 2},
-                                    "content": [{
-                                        "component": "VBtn",
-                                        "props": {
-                                            "type": "submit",
-                                            "color": "success",
-                                            "size": "large",
-                                            "block": True
-                                        },
-                                        "text": "获取链接",
-                                        "events": {
-                                            "click": {
-                                                "api": f"plugin/SeedHub/links?apikey={settings.API_TOKEN}",
-                                                "method": "post",
-                                                "form": true,
-                                                "success": {
-                                                    "message": "链接解析成功，已复制到剪贴板",
-                                                    "action": "copy",
-                                                    "data": "{{JSON.stringify(result.data, null, 2)}}"
-                                                },
-                                                "error": {
-                                                    "message": "获取链接失败：{{result.message}}"
-                                                }
-                                            }
-                                        }
-                                    }],
-                                },
-                            ],
-                        }
-                    ]
-                }
-            ],
-        })
-
-        # 帮助提示
-        page_content.append({
-            "component": "VAlert",
-            "props": {
-                "type": "info",
-                "variant": "tonal",
-                "border": "start",
-                "class": "mb-4"
-            },
-            "text": "💡 使用说明：输入关键词点击「立即搜索」，成功后结果会自动复制到剪贴板；粘贴资源ID点击「获取链接」，解析结果也会自动复制。所有操作自动记录到历史列表。"
-        })
-
-        # 历史记录区域
         history = self.get_data("history") or []
-        if history:
-            items = []
-            for item in reversed(history[:50]):
-                items.append({
-                    "time": item.get("time", ""),
-                    "action": "搜索" if item.get("action") == "search" else "取链",
-                    "target": item.get("target", ""),
-                    "summary": item.get("summary", ""),
-                })
+        page_content = [
+            {
+                "component": "VCard",
+                "props": {"class": "pa-4 mb-4"},
+                "content": [
+                    {
+                        "component": "div",
+                        "text": "SeedHub 资源搜索",
+                        "props": {"class": "text-h5 text-primary mb-2"}
+                    },
+                    {
+                        "component": "div",
+                        "text": "请使用插件命令或 API 完成搜索与取链，详情页仅展示基础说明与最近历史。",
+                        "props": {"class": "text-body-2 text-medium-emphasis"}
+                    }
+                ]
+            },
+            {
+                "component": "VAlert",
+                "props": {
+                    "type": "info",
+                    "variant": "tonal",
+                    "class": "mb-4"
+                },
+                "text": "命令：/seedhub_search 关键词；/seedhub_links 条目 ID。也可通过插件 API 调用 /search、/links、/status。"
+            }
+        ]
 
+        if history:
             page_content.append({
                 "component": "VCard",
                 "props": {"class": "pa-4"},
                 "content": [
                     {
-                        "component": "h3",
-                        "text": "📋 操作历史",
-                        "props": {"class": "mb-4"}
+                        "component": "div",
+                        "text": "最近记录",
+                        "props": {"class": "text-subtitle-1 mb-3"}
                     },
                     {
-                        "component": "VDataTableVirtual",
-                        "props": {
-                            "headers": [
-                                {"title": "时间", "key": "time", "sortable": True},
-                                {"title": "动作", "key": "action", "sortable": True},
-                                {"title": "关键词/ID", "key": "target", "sortable": False},
-                                {"title": "摘要", "key": "summary", "sortable": False},
-                            ],
-                            "items": items,
-                            "height": "30rem",
-                            "density": "compact",
-                            "fixed-header": True,
-                            "hide-no-data": True,
-                            "hover": True,
-                        },
+                        "component": "VList",
+                        "content": [
+                            {
+                                "component": "VListItem",
+                                "props": {
+                                    "title": f"{'搜索' if item.get('action') == 'search' else '取链'}：{item.get('target', '')}",
+                                    "subtitle": f"{item.get('time', '')}｜{item.get('summary', '')}"
+                                }
+                            }
+                            for item in reversed(history[-10:])
+                        ]
                     }
                 ]
             })
@@ -466,9 +289,9 @@ class SeedHub(_PluginBase):
                 "props": {"class": "pa-4 text-center"},
                 "content": [
                     {
-                        "component": "p",
+                        "component": "div",
                         "text": "暂无查询记录",
-                        "props": {"class": "text-grey"}
+                        "props": {"class": "text-medium-emphasis"}
                     }
                 ]
             })
