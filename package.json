@@ -514,6 +514,16 @@
       "v1.3": "增加前端版本更新检查，需要主程序升级至v1.8.4+版本"
     }
   },
+  "SeedHub": {
+    "name": "SeedHub 搜索",
+    "description": "搜索 SeedHub 影视资源并提取夸克等下载链接。",
+    "labels": "工具,网盘,资源搜索",
+    "version": "1.0",
+    "icon": "search.png",
+    "author": "Claude",
+    "level": 1,
+    "v2": true
+  },
   "CloudDiskDel": {
     "name": "云盘文件删除",
     "description": "媒体库删除strm文件后同步删除云盘资源。",
