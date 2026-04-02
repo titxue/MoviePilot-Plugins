@@ -228,12 +228,6 @@ class SeedHub(_PluginBase):
 
     def get_page(self) -> List[dict]:
         history = self.get_data("history") or []
-        if not history:
-            return [{
-                "component": "div",
-                "text": "暂无查询记录",
-                "props": {"class": "text-center mt-4"},
-            }]
 
         # 统计数据
         total_count = len(history)
@@ -241,74 +235,158 @@ class SeedHub(_PluginBase):
         links_count = sum(1 for item in history if item.get("action") == "links")
         latest_time = history[-1].get("time", "") if history else ""
 
-        items = []
-        for item in reversed(history[:50]):
-            items.append({
-                "time": item.get("time", ""),
-                "action": item.get("action", ""),
-                "keyword": item.get("keyword", ""),
-                "target": item.get("target", ""),
-                "summary": item.get("summary", ""),
-            })
+        page_content = []
 
-        return [
-            # 统计卡片行
-            {
-                "component": "VRow",
-                "props": {"class": "mb-4"},
-                "content": [
-                    {
-                        "component": "VCol",
-                        "props": {"cols": 12, "md": 3},
-                        "content": [{
-                            "component": "VCard",
-                            "props": {"class": "text-center pa-3"},
-                            "content": [
-                                {"component": "div", "text": "总查询次数", "props": {"class": "text-caption text-grey mb-1"}},
-                                {"component": "div", "text": str(total_count), "props": {"class": "text-h6 font-bold"}},
-                            ],
-                        }],
+        # 统计卡片行
+        page_content.append({
+            "component": "VRow",
+            "props": {"class": "mb-4"},
+            "content": [
+                {
+                    "component": "VCol",
+                    "props": {"cols": 12, "md": 3},
+                    "content": [{
+                        "component": "VCard",
+                        "props": {"class": "text-center pa-3"},
+                        "content": [
+                            {"component": "div", "text": "总查询次数", "props": {"class": "text-caption text-grey mb-1"}},
+                            {"component": "div", "text": str(total_count), "props": {"class": "text-h6 font-bold"}},
+                        ],
+                    }],
+                },
+                {
+                    "component": "VCol",
+                    "props": {"cols": 12, "md": 3},
+                    "content": [{
+                        "component": "VCard",
+                        "props": {"class": "text-center pa-3"},
+                        "content": [
+                            {"component": "div", "text": "搜索次数", "props": {"class": "text-caption text-grey mb-1"}},
+                            {"component": "div", "text": str(search_count), "props": {"class": "text-h6 font-bold text-primary"}},
+                        ],
+                    }],
+                },
+                {
+                    "component": "VCol",
+                    "props": {"cols": 12, "md": 3},
+                    "content": [{
+                        "component": "VCard",
+                        "props": {"class": "text-center pa-3"},
+                        "content": [
+                            {"component": "div", "text": "取链次数", "props": {"class": "text-caption text-grey mb-1"}},
+                            {"component": "div", "text": str(links_count), "props": {"class": "text-h6 font-bold text-success"}},
+                        ],
+                    }],
+                },
+                {
+                    "component": "VCol",
+                    "props": {"cols": 12, "md": 3},
+                    "content": [{
+                        "component": "VCard",
+                        "props": {"class": "text-center pa-3"},
+                        "content": [
+                            {"component": "div", "text": "最近操作", "props": {"class": "text-caption text-grey mb-1"}},
+                            {"component": "div", "text": latest_time, "props": {"class": "text-sm"}},
+                        ],
+                    }],
+                },
+            ],
+        })
+
+        # 搜索表单区域
+        page_content.append({
+            "component": "VCard",
+            "props": {"class": "mb-4 pa-4"},
+            "content": [
+                {
+                    "component": "VForm",
+                    "props": {
+                        "action": "/api/v1/plugin/SeedHub/search",
+                        "method": "post",
+                        "target": "_blank"
                     },
-                    {
-                        "component": "VCol",
-                        "props": {"cols": 12, "md": 3},
-                        "content": [{
-                            "component": "VCard",
-                            "props": {"class": "text-center pa-3"},
+                    "content": [
+                        {
+                            "component": "VRow",
+                            "props": {"align": "center"},
                             "content": [
-                                {"component": "div", "text": "搜索次数", "props": {"class": "text-caption text-grey mb-1"}},
-                                {"component": "div", "text": str(search_count), "props": {"class": "text-h6 font-bold text-primary"}},
+                                {
+                                    "component": "VCol",
+                                    "props": {"cols": 12, "md": 8},
+                                    "content": [{
+                                        "component": "VTextField",
+                                        "props": {
+                                            "name": "keyword",
+                                            "label": "搜索关键词",
+                                            "placeholder": "请输入要搜索的影视名称",
+                                            "variant": "outlined",
+                                            "density": "comfortable"
+                                        }
+                                    }],
+                                },
+                                {
+                                    "component": "VCol",
+                                    "props": {"cols": 12, "md": 2},
+                                    "content": [{
+                                        "component": "VTextField",
+                                        "props": {
+                                            "name": "limit",
+                                            "label": "结果数量",
+                                            "type": "number",
+                                            "min": 1,
+                                            "max": 50,
+                                            "value": self._config.search_limit,
+                                            "variant": "outlined",
+                                            "density": "comfortable"
+                                        }
+                                    }],
+                                },
+                                {
+                                    "component": "VCol",
+                                    "props": {"cols": 12, "md": 2},
+                                    "content": [{
+                                        "component": "VBtn",
+                                        "props": {
+                                            "type": "submit",
+                                            "color": "primary",
+                                            "size": "large",
+                                            "block": True
+                                        },
+                                        "text": "立即搜索"
+                                    }],
+                                },
                             ],
-                        }],
-                    },
-                    {
-                        "component": "VCol",
-                        "props": {"cols": 12, "md": 3},
-                        "content": [{
-                            "component": "VCard",
-                            "props": {"class": "text-center pa-3"},
-                            "content": [
-                                {"component": "div", "text": "取链次数", "props": {"class": "text-caption text-grey mb-1"}},
-                                {"component": "div", "text": str(links_count), "props": {"class": "text-h6 font-bold text-success"}},
-                            ],
-                        }],
-                    },
-                    {
-                        "component": "VCol",
-                        "props": {"cols": 12, "md": 3},
-                        "content": [{
-                            "component": "VCard",
-                            "props": {"class": "text-center pa-3"},
-                            "content": [
-                                {"component": "div", "text": "最近操作", "props": {"class": "text-caption text-grey mb-1"}},
-                                {"component": "div", "text": latest_time, "props": {"class": "text-sm"}},
-                            ],
-                        }],
-                    },
-                ],
+                        }
+                    ]
+                }
+            ]
+        })
+
+        # 帮助提示
+        page_content.append({
+            "component": "VAlert",
+            "props": {
+                "type": "info",
+                "variant": "tonal",
+                "border": "start",
+                "class": "mb-4"
             },
-            # 历史表格
-            {
+            "text": "💡 搜索后会在新窗口展示结果，复制需要的条目ID后，可以通过命令 /seedhub_links [ID] 获取下载链接。后续版本将支持直接在页面内展示结果和一键取链。"
+        })
+
+        # 历史记录区域
+        if history:
+            items = []
+            for item in reversed(history[:50]):
+                items.append({
+                    "time": item.get("time", ""),
+                    "action": item.get("action", ""),
+                    "keyword": item.get("keyword", ""),
+                    "target": item.get("target", ""),
+                    "summary": item.get("summary", ""),
+                })
+
+            page_content.append({
                 "component": "VRow",
                 "content": [{
                     "component": "VCol",
@@ -331,8 +409,15 @@ class SeedHub(_PluginBase):
                         },
                     }],
                 }],
-            },
-        ]
+            })
+        else:
+            page_content.append({
+                "component": "div",
+                "text": "暂无查询记录",
+                "props": {"class": "text-center mt-4"},
+            })
+
+        return page_content
 
     def api_status(self) -> schemas.Response:
         return schemas.Response(success=True, data=self._config.model_dump())
