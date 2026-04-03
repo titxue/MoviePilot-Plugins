@@ -242,7 +242,7 @@ class SeedHub(_PluginBase):
                 },
                 {
                     "component": "div",
-                    "text": "页面内可直接完成搜索与取链，结果会展示在当前详情页，并写入最近历史。",
+                    "text": "页面内可直接提交搜索与取链，请通过最近历史确认执行结果。",
                     "props": {"class": "text-body-2 text-medium-emphasis"}
                 }
             ]
@@ -305,24 +305,7 @@ class SeedHub(_PluginBase):
                                             "click": {
                                                 "api": f"plugin/SeedHub/search?apikey={settings.API_TOKEN}",
                                                 "method": "post",
-                                                "form": True,
-                                                "success": {
-                                                    "message": "搜索成功，找到 {{result.data.length}} 个结果",
-                                                    "set": {
-                                                        "searchResults": "{{result.data}}",
-                                                        "searchError": "",
-                                                        "linksResult": null,
-                                                        "linksError": "",
-                                                        "linkMovieId": ""
-                                                    }
-                                                },
-                                                "error": {
-                                                    "message": "搜索失败：{{result.message}}",
-                                                    "set": {
-                                                        "searchResults": [],
-                                                        "searchError": "{{result.message}}"
-                                                    }
-                                                }
+                                                "form": True
                                             }
                                         }
                                     }],
@@ -391,22 +374,7 @@ class SeedHub(_PluginBase):
                                             "click": {
                                                 "api": f"plugin/SeedHub/links?apikey={settings.API_TOKEN}",
                                                 "method": "post",
-                                                "form": True,
-                                                "success": {
-                                                    "message": "链接解析成功",
-                                                    "set": {
-                                                        "linksResult": "{{result.data}}",
-                                                        "linkMovieId": "{{form.movie_id || ''}}",
-                                                        "linksError": ""
-                                                    }
-                                                },
-                                                "error": {
-                                                    "message": "获取链接失败：{{result.message}}",
-                                                    "set": {
-                                                        "linksResult": null,
-                                                        "linksError": "{{result.message}}"
-                                                    }
-                                                }
+                                                "form": True
                                             }
                                         }
                                     }],
@@ -426,99 +394,6 @@ class SeedHub(_PluginBase):
                 "class": "mb-4"
             },
             "text": "使用说明：先搜索，再将结果中的条目 ID 填入取链区域。提交后详情页会自动刷新，最近历史会保留本次操作记录。"
-        })
-
-        page_content.append({
-            "component": "VAlert",
-            "props": {
-                "type": "error",
-                "variant": "tonal",
-                "class": "mb-4",
-                "show": "{{searchError}}"
-            },
-            "text": "{{searchError}}"
-        })
-
-        page_content.append({
-            "component": "VCard",
-            "props": {"class": "mb-4 pa-4", "show": "{{searchResults && searchResults.length}}"},
-            "content": [
-                {
-                    "component": "div",
-                    "text": "搜索结果",
-                    "props": {"class": "text-subtitle-1 mb-3"}
-                },
-                {
-                    "component": "VTextarea",
-                    "props": {
-                        "label": "结果列表",
-                        "rows": 12,
-                        "readonly": True,
-                        "auto-grow": True,
-                        "variant": "outlined",
-                        "model-value": "{{(searchResults || []).map(item => `ID: ${item.id} | ${item.title} | 评分: ${item.rating || '?'}`).join('\\n')}}"
-                    }
-                }
-            ]
-        })
-
-        page_content.append({
-            "component": "VAlert",
-            "props": {
-                "type": "error",
-                "variant": "tonal",
-                "class": "mb-4",
-                "show": "{{linksError}}"
-            },
-            "text": "{{linksError}}"
-        })
-
-        page_content.append({
-            "component": "VCard",
-            "props": {"class": "mb-4 pa-4", "show": "{{linksResult}}"},
-            "content": [
-                {
-                    "component": "div",
-                    "text": "取链结果",
-                    "props": {"class": "text-subtitle-1 mb-3"}
-                },
-                {
-                    "component": "VTextField",
-                    "props": {
-                        "model": "linkMovieId",
-                        "label": "当前条目 ID",
-                        "readonly": True,
-                        "variant": "outlined",
-                        "class": "mb-3",
-                        "show": "{{linkMovieId}}"
-                    }
-                },
-                {
-                    "component": "VTextarea",
-                    "props": {
-                        "label": "夸克直链",
-                        "rows": 6,
-                        "readonly": True,
-                        "auto-grow": True,
-                        "variant": "outlined",
-                        "model-value": "{{(linksResult.quark_resolved || []).map(item => item.url).filter(Boolean).join('\\n')}}",
-                        "show": "{{linksResult && linksResult.quark_resolved && linksResult.quark_resolved.length}}"
-                    }
-                },
-                {
-                    "component": "VTextarea",
-                    "props": {
-                        "label": "磁力链接",
-                        "rows": 6,
-                        "readonly": True,
-                        "auto-grow": True,
-                        "variant": "outlined",
-                        "class": "mt-3",
-                        "model-value": "{{(linksResult.magnet || []).join('\\n')}}",
-                        "show": "{{linksResult && linksResult.magnet && linksResult.magnet.length}}"
-                    }
-                }
-            ]
         })
 
         history = self.get_data("history") or []
