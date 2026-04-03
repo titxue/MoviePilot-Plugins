@@ -11,7 +11,7 @@ from app.log import logger
 from app.plugins import _PluginBase
 from app.schemas import NotificationType
 from app.schemas.types import EventType
-from fastapi import Body
+from fastapi import Body, Form
 
 from .models import SeedHubConfig, SeedHubLinksRequest, SeedHubSearchRequest
 from .services import SeedHubService
@@ -25,7 +25,7 @@ class SeedHub(_PluginBase):
     # 插件图标
     plugin_icon = "https://raw.githubusercontent.com/Hqyel/MoviePilot-Plugins/main/icons/nullbr.png"
     # 插件版本
-    plugin_version = "1.3.2"
+    plugin_version = "1.3.3"
     # 插件作者
     plugin_author = "Claude"
     # 作者主页
@@ -440,9 +440,12 @@ class SeedHub(_PluginBase):
     def api_status(self) -> schemas.Response:
         return schemas.Response(success=True, data=self._config.model_dump())
 
-    def api_search(self, item: SeedHubSearchRequest = Body(...)) -> schemas.Response:
+    def api_search(self,
+                   keyword: str = Form(...),
+                   limit: Optional[int] = Form(None)) -> schemas.Response:
         if not self._config.enabled:
             return schemas.Response(success=False, message="插件未启用")
+        item = SeedHubSearchRequest(keyword=keyword, limit=limit)
         try:
             results = self._service.search(item.keyword, item.limit)
             self._append_history(
@@ -456,9 +459,12 @@ class SeedHub(_PluginBase):
             logger.error(f"SeedHub search failed: {err}")
             return schemas.Response(success=False, message=str(err))
 
-    def api_links(self, item: SeedHubLinksRequest = Body(...)) -> schemas.Response:
+    def api_links(self,
+                  movie_id: str = Form(...),
+                  quark_limit: Optional[int] = Form(None)) -> schemas.Response:
         if not self._config.enabled:
             return schemas.Response(success=False, message="插件未启用")
+        item = SeedHubLinksRequest(movie_id=movie_id, quark_limit=quark_limit)
         try:
             result = self._service.get_links(item.movie_id, item.quark_limit)
             self._append_history(
